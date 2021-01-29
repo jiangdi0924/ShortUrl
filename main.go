@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"short/utils"
 	"strconv"
 	"time"
 
@@ -56,5 +55,5 @@ func main() {
 		return nil
 	})
 
-	app.Listen(fmt.Sprintf(":%v", utils.Env("PORT", "3000")))
+	app.Listen(fmt.Sprintf(":%v", 3003))
 }

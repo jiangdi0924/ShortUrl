@@ -35,3 +35,4 @@ go.sum
 app/services/workspace.code-workspace
 test.db
 test.db-journal
+main
