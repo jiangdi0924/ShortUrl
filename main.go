@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -34,31 +33,46 @@ func main() {
 	app.Get("/set/*", func(c *fiber.Ctx) error {
 		long_url := c.Params("*")
 		long := &ShortUrl{Url: long_url}
+
 		result := db.Create(&long)
 
 		if result.Error != nil {
 			return fiber.NewError(fiber.StatusConflict, result.Error.Error())
 		}
+
+		short := fmt.Sprintf("%v/t%v", c.Hostname(), long.ID)
+
 		db.Model(&ShortUrl{}).
 			Where(&ShortUrl{ID: long.ID}).
-			Update("short", c.Hostname()+strconv.Itoa(int(long.ID)))
+			Update("short", short)
 
 		record := &ShortUrl{}
 		db.Model(&ShortUrl{}).
 			Where("url = ?", long_url).
 			First(record)
 
-		return c.JSON(record)
+		return c.JSON(fiber.Map{
+			"CScriptUrl": record.Short,
+		})
 	})
 
-	app.Get("/*", func(c *fiber.Ctx) error {
+	app.Get("/t:id", func(c *fiber.Ctx) error {
 		record := &ShortUrl{}
 		db.Model(&ShortUrl{}).
-			Where("id", c.Params("*")).
+			Where("id", c.Params("id")).
 			First(record)
 		// fmt.Println(record.Url)
 		c.Redirect(record.Url)
-		return nil
+
+		return c.JSON(record)
+	})
+
+	app.Get("/lists", func(c *fiber.Ctx) error {
+		records := []ShortUrl{}
+
+		db.Model(&ShortUrl{}).
+			Find(&records)
+		return c.JSON(records)
 	})
 
 	app.Listen(fmt.Sprintf(":%v", 3003))
