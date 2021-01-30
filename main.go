@@ -42,15 +42,21 @@ func main() {
 		db.Model(&ShortUrl{}).
 			Where(&ShortUrl{ID: long.ID}).
 			Update("short", c.Hostname()+strconv.Itoa(int(long.ID)))
-		return c.JSON(long)
-	})
 
-	app.Get("/goto/*", func(c *fiber.Ctx) error {
 		record := &ShortUrl{}
 		db.Model(&ShortUrl{}).
-			Where("short", c.Params("*")).
+			Where("url = ?", long_url).
 			First(record)
-		fmt.Println(record.Url)
+
+		return c.JSON(record)
+	})
+
+	app.Get("/*", func(c *fiber.Ctx) error {
+		record := &ShortUrl{}
+		db.Model(&ShortUrl{}).
+			Where("id", c.Params("*")).
+			First(record)
+		// fmt.Println(record.Url)
 		c.Redirect(record.Url)
 		return nil
 	})
