@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"short/utils"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -40,7 +41,7 @@ func main() {
 			return fiber.NewError(fiber.StatusConflict, result.Error.Error())
 		}
 
-		short := fmt.Sprintf("%v/t%v", c.Hostname(), long.ID)
+		short := fmt.Sprintf("%v/t%v", utils.Env("DOMAIN", "https://url.cscript.site"), long.ID)
 
 		db.Model(&ShortUrl{}).
 			Where(&ShortUrl{ID: long.ID}).
@@ -75,5 +76,5 @@ func main() {
 		return c.JSON(records)
 	})
 
-	app.Listen(fmt.Sprintf(":%v", 3003))
+	app.Listen(fmt.Sprintf(":%v", utils.Env("PORT", "3000")))
 }
