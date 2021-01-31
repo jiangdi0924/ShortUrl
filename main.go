@@ -53,7 +53,7 @@ func main() {
 			First(record)
 
 		return c.JSON(fiber.Map{
-			"CScriptUrl": record.Short,
+			"CScriptUrl": short,
 		})
 	})
 
